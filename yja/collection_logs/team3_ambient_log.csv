@@ -1,0 +1,95 @@
+logged_at,subject,label,ambient,trial_start,trial_end,duration_s,repeat,port,status,note
+2026-06-22T14:12:10,yja,empty,quiet,t001,t020,20,20,/dev/cu.usbmodem1101,done,
+2026-06-22T14:23:56,yja,empty,aircon,t021,t037,20,17,/dev/cu.usbmodem1101,done,
+2026-06-22T14:37:20,yja,empty,tv,t038,t053,20,16,/dev/cu.usbmodem1101,done,
+2026-06-22T14:49:10,yja,empty,music,t054,t066,20,13,/dev/cu.usbmodem1101,done,
+2026-06-22T15:06:40,yja,sitting_still,quiet,t001,t007,20,7,/dev/cu.usbmodem1101,done,
+2026-06-22T15:12:19,yja,sitting_still,aircon,t008,t013,20,6,/dev/cu.usbmodem1101,done,
+2026-06-22T15:15:44,yja,sitting_still,tv,t014,t018,20,5,/dev/cu.usbmodem1101,done,
+2026-06-22T15:19:05,yja,sitting_still,music,t019,t022,20,4,/dev/cu.usbmodem1101,done,
+2026-06-22T15:23:40,yja,standing_still,quiet,t001,t007,20,7,/dev/cu.usbmodem1101,done,
+2026-06-22T15:27:23,yja,standing_still,aircon,t008,t013,20,6,/dev/cu.usbmodem1101,done,
+2026-06-22T15:31:20,yja,standing_still,tv,t014,t018,20,5,/dev/cu.usbmodem1101,done,
+2026-06-22T15:35:05,yja,standing_still,music,t019,t022,20,4,/dev/cu.usbmodem1101,done,
+2026-06-22T15:43:03,yja,lying_still,quiet,t001,t007,20,7,/dev/cu.usbmodem1101,done,
+2026-06-22T15:50:00,yja,lying_still,aircon,t008,t013,20,6,/dev/cu.usbmodem1101,done,
+2026-06-22T15:55:17,yja,lying_still,tv,t014,t018,20,5,/dev/cu.usbmodem1101,done,
+2026-06-22T15:58:12,yja,lying_still,music,t019,t022,20,4,/dev/cu.usbmodem1101,done,
+2026-06-22T16:07:33,yja,hand_move,quiet,t001,t010,20,10,/dev/cu.usbmodem1101,done,
+2026-06-22T16:13:31,yja,hand_move,aircon,t011,t018,20,8,/dev/cu.usbmodem1101,done,
+2026-06-22T16:18:51,yja,hand_move,tv,t019,t026,20,8,/dev/cu.usbmodem1101,done,
+2026-06-22T16:24:16,yja,hand_move,music,t027,t033,20,7,/dev/cu.usbmodem1101,done,
+2026-06-22T16:35:39,yja,walking,quiet,t001,t010,20,10,/dev/cu.usbmodem1101,done,
+2026-06-22T16:43:22,yja,walking,aircon,t011,t019,20,9,/dev/cu.usbmodem1101,done,"bed_between_boards, walked_along_bed_side"
+2026-06-22T16:49:19,yja,walking,tv,t020,t027,20,8,/dev/cu.usbmodem1101,done,"bed_between_boards, walked_along_bed_side"
+2026-06-22T16:54:22,yja,walking,music,t028,t034,20,7,/dev/cu.usbmodem1101,done,"bed_between_boards, walked_along_bed_side"
+2026-06-22T17:04:05,yja,sit_to_stand,quiet,t001,t005,10,5,/dev/cu.usbmodem1101,done,
+2026-06-22T17:06:00,yja,sit_to_stand,aircon,t006,t009,10,4,/dev/cu.usbmodem1101,done,
+2026-06-22T17:08:52,yja,sit_to_stand,tv,t010,t013,10,4,/dev/cu.usbmodem1101,done,
+2026-06-22T17:10:48,yja,sit_to_stand,music,t014,t017,10,4,/dev/cu.usbmodem1101,done,
+2026-06-22T17:15:06,yja,stand_to_sit,quiet,t001,t005,10,5,/dev/cu.usbmodem1101,done,
+2026-06-22T17:18:08,yja,stand_to_sit,aircon,t006,t009,10,4,/dev/cu.usbmodem1101,done,
+2026-06-22T17:20:31,yja,stand_to_sit,tv,t010,t013,10,4,/dev/cu.usbmodem1101,done,
+2026-06-22T17:23:21,yja,stand_to_sit,music,t014,t017,10,4,/dev/cu.usbmodem1101,done,
+2026-06-22T17:26:36,yja,stand_to_lie_normal,quiet,t001,t005,10,5,/dev/cu.usbmodem1101,done,"bed_between_boards, normal_lie_down_on_bed"
+2026-06-22T17:28:35,yja,stand_to_lie_normal,aircon,t006,t009,10,4,/dev/cu.usbmodem1101,done,"bed_between_boards, normal_lie_down_on_bed"
+2026-06-22T17:30:40,yja,stand_to_lie_normal,tv,t010,t013,10,4,/dev/cu.usbmodem1101,done,"bed_between_boards, normal_lie_down_on_bed"
+2026-06-22T17:32:36,yja,stand_to_lie_normal,music,t014,t017,10,4,/dev/cu.usbmodem1101,done,"bed_between_boards, normal_lie_down_on_bed"
+2026-06-22T17:35:36,yja,lie_to_stand,quiet,t001,t005,10,5,/dev/cu.usbmodem1101,done,"bed_between_boards, stand_up_from_bed"
+2026-06-22T17:37:31,yja,lie_to_stand,aircon,t006,t009,10,4,/dev/cu.usbmodem1101,done,"bed_between_boards, stand_up_from_bed"
+2026-06-22T17:39:43,yja,lie_to_stand,tv,t010,t013,10,4,/dev/cu.usbmodem1101,done,"bed_between_boards, stand_up_from_bed"
+2026-06-22T17:43:32,yja,lie_to_stand,music,t014,t017,10,4,/dev/cu.usbmodem1101,done,"bed_between_boards, stand_up_from_bed"
+2026-06-22T17:57:14,yja,lying_normal_breath,quiet,t001,t020,20,20,/dev/cu.usbmodem1101,done,"bed_between_boards, normal_breath_on_bed"
+2026-06-22T18:21:16,yja,lying_normal_breath,aircon,t021,t037,20,17,/dev/cu.usbmodem1101,done,"bed_between_boards, normal_breath_on_bed"
+2026-06-22T18:34:06,yja,lying_normal_breath,tv,t038,t054,20,17,/dev/cu.usbmodem1101,done,"bed_between_boards, normal_breath_on_bed"
+2026-06-22T18:42:44,yja,lying_normal_breath,music,t055,t067,20,13,/dev/cu.usbmodem1101,done,"bed_between_boards, normal_breath_on_bed"
+2026-06-22T20:14:01,yja,bed_sitting_to_stand_fall,quiet,t001,t008,10,8,/dev/cu.usbmodem1101,done,"danger_v2, bed_between_boards, bed_sitting_to_stand_fall"
+2026-06-22T20:25:34,yja,bed_sitting_to_stand_fall,aircon,t009,t015,10,7,/dev/cu.usbmodem1101,done,"danger_v2, bed_between_boards, bed_sitting_to_stand_fall"
+2026-06-22T20:31:29,yja,bed_sitting_to_stand_fall,tv,t016,t021,10,6,/dev/cu.usbmodem1101,done,"danger_v2, bed_between_boards, bed_sitting_to_stand_fall"
+2026-06-22T20:34:40,yja,bed_sitting_to_stand_fall,music,t022,t026,10,5,/dev/cu.usbmodem1101,done,"danger_v2, bed_between_boards, bed_sitting_to_stand_fall"
+2026-06-22T20:40:41,yja,bed_lying_to_stand_fall,quiet,t001,t008,10,8,/dev/cu.usbmodem1101,done,"danger_v2, bed_between_boards, case1_t001_t004_lying_to_stand_fall, case2_t005_t008_lying_bed_fall"
+2026-06-22T20:44:18,yja,bed_lying_to_stand_fall,aircon,t009,t015,10,7,/dev/cu.usbmodem1101,done,"danger_v2, bed_between_boards, case1_t009_t012_lying_to_stand_fall, case2_t013_t015_lying_bed_fall"
+2026-06-22T20:50:50,yja,bed_lying_to_stand_fall,tv,t016,t022,10,7,/dev/cu.usbmodem1101,done,"danger_v2, bed_between_boards, case1_t016_t019_lying_to_stand_fall, case2_t020_t022_lying_bed_fall"
+2026-06-22T20:55:38,yja,bed_lying_to_stand_fall,music,t023,t027,10,5,/dev/cu.usbmodem1101,done,"danger_v2, bed_between_boards, case1_t023_t025_lying_to_stand_fall, case2_t026_t027_lying_bed_fall"
+2026-06-22T21:30:12,yja,bed_stand_to_lie_fall,quiet,t001,t008,10,8,/dev/cu.usbmodem1101,done,"danger_v2, bed_between_boards, bed_stand_to_lie_fall"
+2026-06-22T21:32:54,yja,bed_stand_to_lie_fall,aircon,t009,t015,10,7,/dev/cu.usbmodem1101,done,"danger_v2, bed_between_boards, bed_stand_to_lie_fall"
+2026-06-22T21:54:26,yja,bed_stand_to_lie_fall,tv,t016,t022,10,7,/dev/cu.usbmodem1101,done,"danger_v2, bed_between_boards, bed_stand_to_lie_fall"
+2026-06-22T23:40:48,yja,bed_stand_to_lie_fall,music,t023,t027,10,5,/dev/cu.usbmodem1101,done,"danger_v2, bed_between_boards, bed_stand_to_lie_fall"
+2026-06-22T23:49:18,yja,chair_sitting_to_stand_fall,quiet,t001,t008,10,8,/dev/cu.usbmodem1101,done,"danger_v2, chair_near_bed, chair_sitting_to_stand_fall"
+2026-06-23T00:03:45,yja,chair_sitting_to_stand_fall,tv,t016,t021,10,6,/dev/cu.usbmodem1101,done,"danger_v2, chair_near_bed, chair_sitting_to_stand_fall"
+2026-06-23T00:06:29,yja,chair_sitting_to_stand_fall,music,t022,t026,10,5,/dev/cu.usbmodem1101,done,"danger_v2, chair_near_bed, chair_sitting_to_stand_fall"
+2026-06-23T00:13:49,yja,chair_stand_to_sit_fall,quiet,t001,t008,10,8,/dev/cu.usbmodem1101,done,"danger_v2, chair_near_bed, chair_stand_to_sit_fall"
+2026-06-23T00:17:04,yja,chair_stand_to_sit_fall,tv,t016,t022,10,7,/dev/cu.usbmodem1101,done,"danger_v2, chair_near_bed, chair_stand_to_sit_fall"
+2026-06-23T00:19:29,yja,chair_stand_to_sit_fall,music,t023,t027,10,5,/dev/cu.usbmodem1101,done,"danger_v2, chair_near_bed, chair_stand_to_sit_fall"
+2026-06-23T01:32:16,yja,lying_apnea_like,quiet,t001,t007,20,7,/dev/cu.usbmodem1101,done,"danger_v2, bed_between_boards, supine_position, very_small_breath_motion"
+2026-06-23T01:36:13,yja,lying_apnea_like,tv,t014,t018,20,5,/dev/cu.usbmodem1101,done,"danger_v2, bed_between_boards, supine_position, very_small_breath_motion, tv_on"
+2026-06-23T01:39:19,yja,lying_apnea_like,music,t019,t023,20,5,/dev/cu.usbmodem1101,done,"danger_v2, bed_between_boards, supine_position, very_small_breath_motion, music_on"
+2026-06-23T01:43:53,yja,post_fall_apnea_like,quiet,t001,t007,20,7,/dev/cu.usbmodem1101,done,"danger_v2, bed_between_boards, post_fall_pose_on_floor_or_mat, very_small_breath_motion"
+2026-06-23T01:47:14,yja,post_fall_apnea_like,tv,t014,t018,20,5,/dev/cu.usbmodem1101,done,"danger_v2, bed_between_boards, post_fall_pose_on_floor_or_mat, very_small_breath_motion, tv_on"
+2026-06-23T01:50:45,yja,post_fall_apnea_like,music,t019,t023,20,5,/dev/cu.usbmodem1101,done,"danger_v2, bed_between_boards, post_fall_pose_on_floor_or_mat, very_small_breath_motion, music_on"
+2026-06-23T02:41:11,yja,lying_convulsive_like_movement,quiet,t001,t006,10,6,/dev/cu.usbmodem1101,done,"danger_v2, bed_between_boards, lying_convulsive_like_movement, short_irregular_twitching"
+2026-06-23T02:44:12,yja,lying_convulsive_like_movement,tv,t012,t016,10,5,/dev/cu.usbmodem1101,done,"danger_v2, bed_between_boards, lying_convulsive_like_movement, short_irregular_twitching, tv_on"
+2026-06-23T02:47:02,yja,lying_convulsive_like_movement,music,t017,t021,10,5,/dev/cu.usbmodem1101,done,"danger_v2, bed_between_boards, lying_convulsive_like_movement, short_irregular_twitching, music_on"
+2026-06-23T11:58:12,yja,chair_sitting_to_stand_fall,aircon,t009,t015,10,7,/dev/cu.usbmodem1101,failed:1:at:t009,"danger_v2, chair_near_bed, chair_sitting_to_stand_fall, aircon_on"
+2026-06-23T12:00:40,yja,chair_sitting_to_stand_fall,aircon,t009,t015,10,7,/dev/cu.usbmodem1101,failed:1:at:t009,"danger_v2, chair_near_bed, chair_sitting_to_stand_fall, aircon_on"
+2026-06-23T12:07:33,yja,chair_sitting_to_stand_fall,aircon,t009,t015,10,7,/dev/cu.usbmodem101,done,"danger_v2, chair_near_bed, chair_sitting_to_stand_fall, aircon_on"
+2026-06-23T12:13:02,yja,chair_stand_to_sit_fall,aircon,t009,t015,10,7,/dev/cu.usbmodem101,done,"danger_v2, chair_near_bed, chair_stand_to_sit_fall, aircon_on"
+2026-06-23T12:18:26,yja,lying_apnea_like,aircon,t008,t013,20,6,/dev/cu.usbmodem101,done,"danger_v2, bed_between_boards, supine_position, very_small_breath_motion, aircon_on"
+2026-06-23T12:23:40,yja,post_fall_apnea_like,aircon,t008,t013,20,6,/dev/cu.usbmodem101,done,"danger_v2, bed_between_boards, post_fall_pose_on_floor_or_mat, very_small_breath_motion, aircon_on"
+2026-06-23T13:27:40,yja,lying_convulsive_like_movement,aircon,t007,t011,10,5,/dev/cu.usbmodem101,done,"danger_v2, bed_between_boards, lying_convulsive_like_movement, short_irregular_twitching, aircon_on"
+2026-06-24T10:43:52,yja,lying_fast_breath,quiet,t001,t020,20,20,/dev/cu.usbmodem101,failed:no_csi_data:at:t001,"warning_v2, bed_between_boards, supine_position, fast_breath"
+2026-06-24T10:56:27,yja,lying_fast_breath,quiet,t001,t020,20,20,/dev/cu.usbmodem101,done,"warning_v2, bed_between_boards, supine_position, fast_breath"
+2026-06-24T13:03:51,yja,lying_fast_breath,tv,t038,t045,20,8,/dev/cu.usbmodem101,done,"warning_v2, bed_between_boards, supine_position, fast_breath, tv_on"
+2026-06-24T13:21:18,yja,lying_fast_breath,music,t054,t066,20,13,/dev/cu.usbmodem101,done,"warning_v2, bed_between_boards, supine_position, fast_breath, music_on"
+2026-06-24T16:48:05,yja,unstable_walking,quiet,t001,t020,20,20,/dev/cu.usbmodem101,failed:no_csi_data:at:t001,"warning_v2, walking_path_near_bed, unstable_walking"
+2026-06-24T17:08:02,yja,unstable_walking,quiet,t001,t020,20,20,/dev/cu.usbmodem101,failed:no_csi_data:at:t001,"warning_v2, walking_path_near_bed, unstable_walking"
+2026-06-24T17:34:15,yja,unstable_walking,quiet,t001,t020,20,20,/dev/cu.usbmodem101,failed:no_csi_data:at:t001,"warning_v2, walking_path_near_bed, unstable_walking"
+2026-06-24T17:59:58,yja,unstable_walking,quiet,t001,t020,20,20,/dev/cu.usbmodem101,done,"warning_v2, walking_path_near_bed, unstable_walking"
+2026-06-24T18:16:02,yja,unstable_walking,aircon,t021,t037,20,17,/dev/cu.usbmodem101,done,"warning_v2, walking_path_near_bed, unstable_walking, aircon_on"
+2026-06-24T23:12:56,yja,lying_slow_breath,aircon,t021,t037,20,17,/dev/cu.usbmodem101,done,"warning_v2, bed_between_boards, supine_position, slow_breath, aircon_on"
+2026-06-24T23:40:07,yja,lying_irregular_breath,aircon,t021,t037,20,17,/dev/cu.usbmodem101,done,"warning_v2, bed_between_boards, supine_position, irregular_breath, aircon_on"
+2026-06-25T00:00:10,yja,bed_exit_failed,aircon,t021,t037,10,17,/dev/cu.usbmodem101,done,"warning_v2, bed_between_boards, bed_exit_failed, aircon_on"
+2026-06-25T00:51:05,yja,unstable_walking,tv,t038,t053,20,16,/dev/cu.usbmodem101,done,"warning_v2, walking_path_near_bed, unstable_walking, tv_on"
+2026-06-25T01:10:17,yja,lying_slow_breath,tv,t038,t054,20,17,/dev/cu.usbmodem101,done,"warning_v2, bed_between_boards, supine_position, slow_breath, tv_on"
+2026-06-25T01:21:26,yja,lying_irregular_breath,tv,t038,t054,20,17,/dev/cu.usbmodem101,done,"warning_v2, bed_between_boards, supine_position, irregular_breath, tv_on"
+2026-06-25T01:29:25,yja,bed_exit_failed,tv,t038,t054,10,17,/dev/cu.usbmodem101,done,"warning_v2, bed_between_boards, bed_exit_failed, tv_on"
