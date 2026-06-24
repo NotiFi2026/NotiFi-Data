@@ -21,24 +21,18 @@ LABEL_MAP = {
     "lying_normal_breath":  ("safe",    "breathing"),
     # warning
     "lying_fast_breath":        ("warning", "breathing"),
-    "lying_slow_breath":        ("warning", "breathing"),
-    "lying_irregular_breath":   ("warning", "breathing"),
-    "unstable_walking":         ("warning", "gait"),
-    "bed_exit_failed":          ("warning", "bed_exit"),
-    # danger v2
-    "bed_sitting_to_stand_fall":   ("danger", "fall"),
-    "bed_lying_to_stand_fall":     ("danger", "fall"),
-    "bed_stand_to_lie_fall":       ("danger", "fall"),
-    "chair_sitting_to_stand_fall": ("danger", "fall"),
-    "chair_stand_to_sit_fall":     ("danger", "fall"),
-    "walking_trip_fall":           ("danger", "fall"),
-    "walking_turn_fall":           ("danger", "fall"),
-    "post_bed_fall_inactive":      ("danger", "post_fall"),
-    "post_chair_fall_inactive":    ("danger", "post_fall"),
-    "post_walking_fall_inactive":  ("danger", "post_fall"),
-    "lying_apnea_like":            ("danger", "breathing"),
-    "post_fall_apnea_like":        ("danger", "breathing"),
-    "lying_convulsive_like_movement": ("danger", "abnormal_motion"),
+    "lying_long_breath":        ("warning", "breathing"),
+    "lying_shallow_breath":     ("warning", "breathing"),
+    "lying_breath_hold_short":  ("warning", "breathing"),
+    "sitting_inactive_long":    ("warning", "inactivity"),
+    "standing_inactive_long":   ("warning", "inactivity"),
+    "lying_inactive_long":      ("warning", "inactivity"),
+    "fall_like_recovered":      ("warning", "fall"),
+    # danger
+    "fall_simulated":           ("danger",  "fall"),
+    "post_fall_inactive":       ("danger",  "fall"),
+    "lying_apnea_like":         ("danger",  "breathing"),
+    "lying_breath_signal_lost": ("danger",  "breathing"),
 }
 
 DATA_ROOT = Path(__file__).parent.parent / "data"
