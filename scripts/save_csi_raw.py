@@ -1,10 +1,24 @@
 import argparse
 import csv
 import time
+import winsound
 from datetime import datetime
 from pathlib import Path
 
 import serial
+
+
+def beep_start():
+    """삐- 삐- 삐- 삐빅(길게) → 녹화 시작 신호"""
+    for _ in range(3):
+        winsound.Beep(880, 150)
+        time.sleep(0.15)
+    winsound.Beep(1320, 500)
+
+
+def beep_end():
+    """낮은 삐빅 → 녹화 종료 신호"""
+    winsound.Beep(440, 400)
 
 LABEL_MAP = {
     # safe
@@ -19,20 +33,31 @@ LABEL_MAP = {
     "stand_to_lie_normal":  ("safe",    "transition"),
     "lie_to_stand":         ("safe",    "transition"),
     "lying_normal_breath":  ("safe",    "breathing"),
-    # warning
+    # warning - breathing
     "lying_fast_breath":        ("warning", "breathing"),
-    "lying_long_breath":        ("warning", "breathing"),
-    "lying_shallow_breath":     ("warning", "breathing"),
-    "lying_breath_hold_short":  ("warning", "breathing"),
-    "sitting_inactive_long":    ("warning", "inactivity"),
-    "standing_inactive_long":   ("warning", "inactivity"),
-    "lying_inactive_long":      ("warning", "inactivity"),
-    "fall_like_recovered":      ("warning", "fall"),
-    # danger
-    "fall_simulated":           ("danger",  "fall"),
-    "post_fall_inactive":       ("danger",  "fall"),
-    "lying_apnea_like":         ("danger",  "breathing"),
-    "lying_breath_signal_lost": ("danger",  "breathing"),
+    "lying_slow_breath":        ("warning", "breathing"),
+    "lying_irregular_breath":   ("warning", "breathing"),
+    # warning - gait
+    "unstable_walking":         ("warning", "gait"),
+    # warning - bed_exit
+    "bed_exit_failed":          ("warning", "bed_exit"),
+    # danger - fall
+    "bed_sitting_to_stand_fall":   ("danger", "fall"),
+    "bed_lying_to_stand_fall":     ("danger", "fall"),
+    "bed_stand_to_lie_fall":       ("danger", "fall"),
+    "chair_sitting_to_stand_fall": ("danger", "fall"),
+    "chair_stand_to_sit_fall":     ("danger", "fall"),
+    "walking_trip_fall":           ("danger", "fall"),
+    "walking_turn_fall":           ("danger", "fall"),
+    # danger - post_fall
+    "post_bed_fall_inactive":      ("danger", "post_fall"),
+    "post_chair_fall_inactive":    ("danger", "post_fall"),
+    "post_walking_fall_inactive":  ("danger", "post_fall"),
+    # danger - breathing
+    "lying_apnea_like":                  ("danger", "breathing"),
+    "post_fall_apnea_like":              ("danger", "breathing"),
+    # danger - abnormal_motion
+    "lying_convulsive_like_movement":    ("danger", "abnormal_motion"),
 }
 
 DATA_ROOT = Path(__file__).parent.parent / "data"
@@ -109,8 +134,10 @@ def main():
         print(f"\n[{i+1}/{args.repeat}] {trial}  →  {out_path}")
         print(f"  label={args.label}  duration={args.duration}s")
 
+        beep_start()
         count = record_once(ser, out_path, risk, domain,
                             args.subject, args.label, trial, args.duration)
+        beep_end()
         print(f"  저장 완료: {count} frames")
 
         trial = next_trial(trial)
