@@ -22,9 +22,10 @@ def read_amplitude(path: Path, smooth: int = 5) -> tuple[np.ndarray, np.ndarray]
         reader = csv.DictReader(f)
         for row in reader:
             raw = row.get("raw_line", "")
-            if not raw.startswith("CSI_DATA"):
+            payload = row.get("csi_data", "") or raw
+            if not payload:
                 continue
-            m = re.search(r'"?\[(.+?)\]"?', raw)
+            m = re.search(r'"?\[(.+?)\]"?', payload)
             if not m:
                 continue
             try:
@@ -34,7 +35,12 @@ def read_amplitude(path: Path, smooth: int = 5) -> tuple[np.ndarray, np.ndarray]
             I, Q = vals[0::2], vals[1::2]
             amp = np.sqrt(I**2 + Q**2)
             amp = amp[amp > 0]
-            times.append(int(row["pc_time_ms"]))
+            if row.get("pc_monotonic_ns"):
+                times.append(int(row["pc_monotonic_ns"]) / 1_000_000)
+            elif row.get("pc_time_ms"):
+                times.append(int(row["pc_time_ms"]))
+            else:
+                continue
             amps.append(float(amp.mean()) if len(amp) else 0)
 
     if not times:

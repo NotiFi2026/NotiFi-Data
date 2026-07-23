@@ -36,14 +36,22 @@ def load_csv(path: Path) -> tuple[np.ndarray, np.ndarray]:
         reader = csv.DictReader(f)
         for row in reader:
             raw = row.get("raw_line", "")
-            if not raw.startswith("CSI_DATA"):
+            payload = row.get("csi_data", "") or raw
+            if not payload:
                 continue
-            vals = parse_csi_array(raw)
+            vals = parse_csi_array(payload)
             if vals is None or len(vals) < 2:
                 continue
-            times.append(int(row["pc_time_ms"]))
+            if row.get("pc_monotonic_ns"):
+                times.append(int(row["pc_monotonic_ns"]) / 1_000_000)
+            elif row.get("pc_time_ms"):
+                times.append(int(row["pc_time_ms"]))
+            else:
+                continue
             amps.append(amplitude(vals))
 
+    if not times:
+        raise ValueError(f"No valid CSI frames found: {path}")
     t = np.array(times, dtype=np.float64)
     a = np.array(amps, dtype=np.float64)
     t = (t - t[0]) / 1000.0  # ms → sec, start at 0
@@ -71,20 +79,6 @@ def plot(path: Path, smooth: int = 5) -> None:
     else:
         a_plot = a
 
-    label = path.stem.split("_", 1)[1].rsplit("_", 1)[0]  # subject_label_trial → label
-    # extract label from filename: <subject>_<label>_<trial>
-    parts = path.stem.split("_")
-    # find label from LABEL_MAP keys by trying progressively longer substrings
-    known_labels = [
-        "sit_to_stand", "stand_to_sit", "stand_to_lie_normal", "lie_to_stand",
-        "empty", "sitting_still", "standing_still", "lying_still",
-        "hand_move", "walking", "lying_normal_breath",
-        "lying_fast_breath", "lying_long_breath", "lying_shallow_breath",
-        "lying_breath_hold_short", "sitting_inactive_long",
-        "standing_inactive_long", "lying_inactive_long",
-        "fall_like_recovered", "fall_simulated", "post_fall_inactive",
-        "lying_apnea_like", "lying_breath_signal_lost",
-    ]
     detected_label = path.parent.parent.name  # structure: .../label/subject/file.csv
     before, transition, after = phase_labels(detected_label)
 
@@ -112,7 +106,7 @@ def plot(path: Path, smooth: int = 5) -> None:
     ax.grid(True, linestyle="--", linewidth=0.4, alpha=0.5)
     fig.tight_layout()
 
-    out = path.with_suffix(".png")
+    out = path.with_name(f"{path.stem}_csi_plot.png")
     fig.savefig(out, dpi=150)
     print(f"Saved: {out}")
 
