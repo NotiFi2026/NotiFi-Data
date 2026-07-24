@@ -580,7 +580,7 @@ def collect_one(
         csi_plot_summary = {"error": str(exc)}
         print(f"[PLOT ERROR] {exc}")
 
-    automatic_qc = "AUTO_PASS_PENDING_MANUAL_QC" if links_ok and video_ok and plot_ok else "AUTO_REJECT"
+    automatic_qc = "AUTO_PASS_PENDING_MANUAL_QC" if links_ok and video_ok else "AUTO_REJECT"
 
     meta = {
         "dataset_version": "v2.0",

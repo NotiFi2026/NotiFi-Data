@@ -34,6 +34,11 @@ def parse_csi_array(payload: str) -> np.ndarray | None:
 def mean_amplitude(values: np.ndarray) -> float:
     i_values = values[0::2]
     q_values = values[1::2]
+    pair_count = min(len(i_values), len(q_values))
+    if pair_count == 0:
+        return 0.0
+    i_values = i_values[:pair_count]
+    q_values = q_values[:pair_count]
     amplitude = np.sqrt(i_values**2 + q_values**2)
     amplitude = amplitude[amplitude > 0]
     return float(amplitude.mean()) if len(amplitude) else 0.0
