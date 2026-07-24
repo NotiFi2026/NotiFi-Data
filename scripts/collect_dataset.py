@@ -701,7 +701,14 @@ def collect_one(
     return manifest_row, automatic_qc != "AUTO_REJECT"
 
 
-def print_plan(config: SessionConfig, spec, repeat: int, trial_numbers: list[int]) -> None:
+def print_plan(
+    config: SessionConfig,
+    spec,
+    repeat: int,
+    trial_numbers: list[int],
+    break_sec: float,
+    danger_mid_rest_sec: float,
+) -> None:
     print("\n[NotiFi v2.0 Collection Plan]")
     print(
         f"subject={config.subject} environment={config.environment} "
@@ -713,8 +720,13 @@ def print_plan(config: SessionConfig, spec, repeat: int, trial_numbers: list[int
     )
     print(
         f"trial_plan={format_trial_plan(trial_numbers)} "
-        f"default_break=2.0s"
+        f"default_break={break_sec:.1f}s"
     )
+    if spec.risk == "DANGER":
+        if danger_mid_rest_sec > 0:
+            print(f"danger_mid_rest={danger_mid_rest_sec:.1f}s after 5 trials")
+        else:
+            print("danger_mid_rest=disabled")
     print(f"start_pose: {spec.start_pose}")
     for phase, action in spec.timeline:
         print(f"  {phase}: {action}")
@@ -736,6 +748,12 @@ def main() -> None:
     )
     parser.add_argument("--delay", type=int, default=5)
     parser.add_argument("--break-sec", type=float, default=2.0)
+    parser.add_argument(
+        "--danger-mid-rest-sec",
+        type=float,
+        default=180.0,
+        help="Rest seconds after 5 DANGER trials. Use 0 to disable the mid-set rest.",
+    )
     parser.add_argument("--min-link-ratio", type=float, default=0.90)
     parser.add_argument("--preview", action="store_true")
     parser.add_argument(
@@ -765,6 +783,10 @@ def main() -> None:
         )
     if not 0 < args.min_link_ratio <= 1:
         raise ValueError("--min-link-ratio must be within (0, 1]")
+    if args.break_sec < 0:
+        raise ValueError("--break-sec must be non-negative")
+    if args.danger_mid_rest_sec < 0:
+        raise ValueError("--danger-mid-rest-sec must be non-negative")
 
     manifest_path = args.output_root / "manifests" / "trials.csv"
     existing_rows = load_manifest_rows(manifest_path)
@@ -807,7 +829,7 @@ def main() -> None:
         )
 
     validate_session_limits(existing_file_rows, config, spec.risk, repeat)
-    print_plan(config, spec, repeat, trial_numbers)
+    print_plan(config, spec, repeat, trial_numbers, args.break_sec, args.danger_mid_rest_sec)
     if args.dry_run:
         print("[DRY RUN] Hardware was not opened and no files were written.")
         return
@@ -845,9 +867,12 @@ def main() -> None:
                     "if you want to reuse the same trial number."
                 )
             if offset < repeat - 1:
-                if spec.risk == "DANGER" and completed == 5:
-                    print("[SAFETY BREAK] Five DANGER trials completed. Rest for 180 seconds.")
-                    time.sleep(180)
+                if spec.risk == "DANGER" and completed == 5 and args.danger_mid_rest_sec > 0:
+                    print(
+                        f"[SAFETY BREAK] Five DANGER trials completed. "
+                        f"Rest for {args.danger_mid_rest_sec:.1f} seconds."
+                    )
+                    time.sleep(args.danger_mid_rest_sec)
                 else:
                     print(f"[BREAK] {args.break_sec:.1f}s")
                     time.sleep(args.break_sec)
