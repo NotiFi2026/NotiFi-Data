@@ -1,6 +1,6 @@
 # NotiFi Dataset Collection v2.0
 
-NotiFi의 3TX+1RX CSI, RGB 영상, 13-point pose teacher GT를 동기화해 수집하는 현장용 도구다. 기준은 `NotiFi 데이터셋 수집 계획서 v2.0 (2026-07-22)`이며, 이전 데이터셋의 배경음·가전 상태별 분기와 과거 라벨은 사용하지 않는다.
+NotiFi의 3TX+1RX CSI, RGB 영상, 13-point pose teacher GT를 동기화해 수집하는 현장용 도구다. 기준은 `NotiFi 데이터셋 수집 계획서 v2.0 찐막 (2026-07-24)`이며, 이전 데이터셋의 배경음·가전 상태별 분기와 과거 라벨은 사용하지 않는다.
 
 ## 수집 목표
 
@@ -100,9 +100,9 @@ python scripts/create_session.py `
 | --- | --- | --- | ---: |
 | A | `stand_to_lie_normal` 30 + `unstable_walking` 20 | `fall_from_standing` 10 | 60 |
 | B | `stumble_recover` 30 + `lying_still` 18 | `fall_while_walking` 10 | 58 |
-| C | `bed_exit_failed` 25 + `walking` 24 | `fall_collapse` 10 | 59 |
+| C | `bed_exit_failed` 25 + `walking` 24 | `bed_exit_fall` 10 | 59 |
 | D | `lie_to_stand` 18 + `standing_still` 12 + `sitting_still` 12 | `bed_fall` 10 | 52 |
-| E | `absence` 12 + `sit_to_stand` 12 + `stand_to_sit` 12 | `chair_fall` 10 | 46 |
+| E | `absence` 12 + `sit_to_stand` 12 + `stand_to_sit` 12 | `chair_exit_fall` 10 | 46 |
 
 이 다섯 session을 `E01`, `E02`, `E03`에서 반복하면 개인별 825회가 된다.
 
@@ -195,7 +195,7 @@ python scripts/validate_collection.py `
 ```
 
 세부 행동·금지 행동·재수집 기준은 [전체 수집 매뉴얼](docs/collection_manual.md)을 따른다.
-첨부 문서 안에 남아 있던 이전 숫자와 삭제 라벨의 처리 원칙은 [v2.0 구현 기준 메모](docs/implementation_notes.md)에 기록했다.
+첨부 문서 안에 남아 있던 이전 숫자와 미사용 라벨의 처리 원칙은 [v2.0 찐막 구현 기준 메모](docs/implementation_notes.md)에 기록했다.
 
 팀원별 명령:
 

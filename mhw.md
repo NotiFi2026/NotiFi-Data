@@ -32,9 +32,9 @@ macOS에서 iPhone/iPad/Continuity Camera가 감지되면 카메라 확인과 �
 | --- | --- | --- | ---: |
 | A | stand_to_lie_normal 30 + unstable_walking 20 | fall_from_standing 10 | 60 |
 | B | stumble_recover 30 + lying_still 18 | fall_while_walking 10 | 58 |
-| C | bed_exit_failed 25 + walking 24 | fall_collapse 10 | 59 |
+| C | bed_exit_failed 25 + walking 24 | bed_exit_fall 10 | 59 |
 | D | lie_to_stand 18 + standing_still 12 + sitting_still 12 | bed_fall 10 | 52 |
-| E | absence 12 + sit_to_stand 12 + stand_to_sit 12 | chair_fall 10 | 46 |
+| E | absence 12 + sit_to_stand 12 + stand_to_sit 12 | chair_exit_fall 10 | 46 |
 
 각 Session의 DANGER 10회는 마지막에 수행하고, 완료 후 10분 이상 쉰 다음 새 session을 시작한다.
 
@@ -158,12 +158,12 @@ python scripts/collect_dataset.py --label fall_from_standing --repeat 10 --safet
 python scripts/collect_dataset.py --label fall_while_walking --repeat 10 --safety-confirmed
 ```
 
-#### D03 `fall_collapse` - 다리에 힘이 풀리는 주저앉기형 낙상 (10회)
+#### D03 `bed_exit_fall` - 침대에서 일어나려다 낙상 (10회)
 
-시작 자세: 이중 매트 중앙 C에서 양발을 어깨너비로 두고 선다.
+시작 자세: S04와 같은 바로 누운 자세. 침대 이탈 측 바닥 전체를 이중 매트로 덮고 안전요원이 지정 측에 선다.
 
 ```powershell
-python scripts/collect_dataset.py --label fall_collapse --repeat 10 --safety-confirmed
+python scripts/collect_dataset.py --label bed_exit_fall --repeat 10 --safety-confirmed
 ```
 
 #### D04 `bed_fall` - 침대에서 일어난 직후 옆으로 낙상 (10회)
@@ -174,12 +174,12 @@ python scripts/collect_dataset.py --label fall_collapse --repeat 10 --safety-con
 python scripts/collect_dataset.py --label bed_fall --repeat 10 --safety-confirmed
 ```
 
-#### D05 `chair_fall` - 의자에 앉으려다 좌판을 놓쳐 낙상 (10회)
+#### D05 `chair_exit_fall` - 의자에서 일어나려다 낙상 (10회)
 
-시작 자세: S09와 같은 위치에서 등을 의자에 향하고 선다. 지정 낙상 측 의자 옆을 이중 매트로 덮고 의자를 고정한다.
+시작 자세: S03과 같은 착석 자세. 지정 낙상 측 의자 옆을 이중 매트로 덮고 의자를 고정한다.
 
 ```powershell
-python scripts/collect_dataset.py --label chair_fall --repeat 10 --safety-confirmed
+python scripts/collect_dataset.py --label chair_exit_fall --repeat 10 --safety-confirmed
 ```
 
 ## 3. 진행률 및 세션 후 처리

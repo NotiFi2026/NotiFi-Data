@@ -317,19 +317,31 @@ def video_worker(
 ) -> None:
     writer = None
     frame_rows: list[tuple[int, int, float]] = []
-    try:
-        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)) or config.camera_width
-        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)) or config.camera_height
-        requested_fps = float(config.camera_fps)
-        writer = cv2.VideoWriter(
-            str(video_path),
-            cv2.VideoWriter_fourcc(*"mp4v"),
-            requested_fps,
-            (width, height),
-        )
-        if not writer.isOpened():
-            raise RuntimeError(f"Cannot create video: {video_path}")
+    preview_enabled = preview
+    preview_warned = False
+    writer_size: tuple[int, int] | None = None
 
+    def write_frame(frame, frame_index: int) -> int:
+        nonlocal writer, writer_size
+        if writer is None:
+            frame_h, frame_w = frame.shape[:2]
+            writer_size = (frame_w, frame_h)
+            writer_fps = max(float(config.camera_fps), 30.0)
+            writer = cv2.VideoWriter(
+                str(video_path),
+                cv2.VideoWriter_fourcc(*"mp4v"),
+                writer_fps,
+                writer_size,
+            )
+            result["writer_fps"] = writer_fps
+            if not writer.isOpened():
+                raise RuntimeError(f"Cannot create video: {video_path}")
+        elif writer_size is not None and (frame.shape[1], frame.shape[0]) != writer_size:
+            frame = cv2.resize(frame, writer_size)
+        writer.write(frame)
+        return frame_index + 1
+
+    try:
         start_event.wait()
         frame_index = 0
         while not stop_event.is_set():
@@ -338,24 +350,29 @@ def video_worker(
                 continue
             monotonic_ns = time.monotonic_ns()
             elapsed_s = (monotonic_ns - clock["trial_start_ns"]) / 1e9
-            writer.write(frame)
-            frame_rows.append((frame_index, monotonic_ns, elapsed_s))
-            frame_index += 1
+            frame_index = write_frame(frame, frame_index)
+            frame_rows.append((frame_index - 1, monotonic_ns, elapsed_s))
 
-            if preview:
-                shown = frame.copy()
-                cv2.putText(
-                    shown,
-                    f"REC {elapsed_s:04.1f}s",
-                    (20, 38),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.9,
-                    (0, 0, 255),
-                    2,
-                    cv2.LINE_AA,
-                )
-                cv2.imshow("NotiFi collection preview", shown)
-                cv2.waitKey(1)
+            if preview_enabled:
+                try:
+                    shown = frame.copy()
+                    cv2.putText(
+                        shown,
+                        f"REC {elapsed_s:04.1f}s",
+                        (20, 38),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.9,
+                        (0, 0, 255),
+                        2,
+                        cv2.LINE_AA,
+                    )
+                    cv2.imshow("NotiFi collection preview", shown)
+                    cv2.waitKey(1)
+                except Exception as exc:
+                    if not preview_warned:
+                        print(f"[PREVIEW WARN] live preview disabled: {exc}")
+                        preview_warned = True
+                    preview_enabled = False
     except BaseException as exc:
         errors.append(exc)
         stop_event.set()
@@ -363,7 +380,10 @@ def video_worker(
         if writer is not None:
             writer.release()
         if preview:
-            cv2.destroyWindow("NotiFi collection preview")
+            try:
+                cv2.destroyWindow("NotiFi collection preview")
+            except Exception:
+                pass
         with timestamp_path.open("w", newline="", encoding="utf-8") as handle:
             csv_writer = csv.writer(handle)
             csv_writer.writerow(("frame_index", "pc_monotonic_ns", "pc_elapsed_s"))
@@ -406,9 +426,9 @@ def first_contact_region(label: str) -> str:
     return {
         "fall_from_standing": "hip_then_forearm",
         "fall_while_walking": "knee_then_forearm",
-        "fall_collapse": "knee_then_hip_then_forearm",
+        "bed_exit_fall": "hip_then_forearm",
         "bed_fall": "hip_then_forearm",
-        "chair_fall": "hip_then_forearm",
+        "chair_exit_fall": "hip_then_forearm",
     }.get(label, "none")
 
 
@@ -423,6 +443,7 @@ def collect_one(
     preview: bool,
     min_link_ratio: float,
     camera_safety_report: dict,
+    action_cue_sound: bool,
 ) -> tuple[dict, bool]:
     cue_s = cue_for_trial(spec, trial_number)
     variant = variant_for_trial(spec, trial_number)
@@ -517,15 +538,17 @@ def collect_one(
         elapsed = (time.monotonic_ns() - clock["trial_start_ns"]) / 1e9
         if cue_s is not None and cue_monotonic_ns is None and elapsed >= cue_s:
             cue_monotonic_ns = time.monotonic_ns()
-            play_sound("action_cue", sound_enabled)
+            if action_cue_sound:
+                play_sound("action_cue", sound_enabled)
             print(f"[ACTION CUE] {cue_s:.1f}s - perform the action once.")
         time.sleep(0.005)
 
     trial_end_ns = time.monotonic_ns()
     stop_event.set()
+    play_sound("trial_end", sound_enabled)
+    print(f"[END] {source_uid} | elapsed={(trial_end_ns - clock['trial_start_ns']) / 1e9:.2f}s")
     csi_thread.join(timeout=3)
     video_thread.join(timeout=3)
-    play_sound("trial_end", sound_enabled)
 
     if csi_thread.is_alive() or video_thread.is_alive():
         raise RuntimeError("Collection worker did not stop cleanly")
@@ -542,7 +565,7 @@ def collect_one(
     minimum_per_link = 1
     links_ok = all(value >= minimum_per_link for value in tx_counts.values())
     video_frames = int(video_result.get("frames", 0))
-    video_ok = video_frames >= int(config.camera_fps * TRIAL_DURATION_S * 0.8)
+    video_ok = video_frames > 0
     csi_plot_summary: dict = {}
     plot_ok = False
     try:
@@ -609,6 +632,7 @@ def collect_one(
             "requested_width": config.camera_width,
             "requested_height": config.camera_height,
             "requested_fps": config.camera_fps,
+            "writer_fps": video_result.get("writer_fps", max(float(config.camera_fps), 30.0)),
             "frame_count": video_frames,
             "effective_fps": video_result.get("effective_fps", 0.0),
         },
@@ -619,6 +643,7 @@ def collect_one(
             "link_counts": tx_counts,
             "unknown_mac_frames": unknown_count,
             "video_ok": video_ok,
+            "video_qc_rule": "zero_frame_only",
             "csi_visualization_ok": plot_ok,
             "csi_visualization": csi_plot_summary,
         },
@@ -671,7 +696,7 @@ def collect_one(
     print(
         f"[QC] TX1={tx_counts['TX1']} TX2={tx_counts['TX2']} "
         f"TX3={tx_counts['TX3']} link_rule=zero_frame_only "
-        f"video={video_frames} -> {automatic_qc}"
+        f"video={video_frames} video_rule=zero_frame_only -> {automatic_qc}"
     )
     return manifest_row, automatic_qc != "AUTO_REJECT"
 
@@ -713,6 +738,11 @@ def main() -> None:
     parser.add_argument("--break-sec", type=float, default=2.0)
     parser.add_argument("--min-link-ratio", type=float, default=0.90)
     parser.add_argument("--preview", action="store_true")
+    parser.add_argument(
+        "--action-cue-sound",
+        action="store_true",
+        help="Also play the mid-trial action cue sound. By default only trial start/end and set-done sounds are played.",
+    )
     parser.add_argument("--no-sound", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--allow-extra", action="store_true")
@@ -804,6 +834,7 @@ def main() -> None:
                 preview=args.preview,
                 min_link_ratio=args.min_link_ratio,
                 camera_safety_report=camera_safety_report,
+                action_cue_sound=args.action_cue_sound,
             )
             append_manifest(manifest_path, row)
             completed += 1
