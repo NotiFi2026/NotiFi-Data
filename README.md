@@ -265,7 +265,7 @@ python scripts/smpl/overlay_gvhmr_gt.py --uid <trial_uid>  # 원본영상 위 2D
 
 `--uid` 없이 실행하면 사용 가능한 목록을 보여준다. 모든 영상에 만들 필요 없다.
 
-## 8. 진행률과 최종 QC
+## 8. 진행률과 최종 QC - 안 하셔도 됩니다
 
 ```powershell
 python scripts/show_progress.py --subject SUBJECT_ID --environment E01
