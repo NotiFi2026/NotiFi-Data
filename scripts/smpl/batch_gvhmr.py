@@ -26,12 +26,17 @@ import smplx
 GVHMR_ROOT = os.path.expanduser("~/GVHMR")
 
 # 처리할 영상들이 있는 최상위 폴더 (하위까지 재귀 탐색해서 *_video.mp4 를 모두 찾음)
-#   WSL에서 Windows C드라이브: "/mnt/c/Users/mhw/NotiFI/NotiFi-Data/collection_data"
-#   네이티브 Windows       : r"C:\Users\mhw\NotiFI\NotiFi-Data\collection_data"
-VIDEO_ROOT = "/mnt/c/Users/mhw/NotiFI/NotiFi-Data/collection_data"
+#   스크립트 위치 기준 자동 계산 (팀원 repo 경로 달라도 수정 불필요).
+#   필요시 환경변수 NOTIFI_VIDEO_ROOT 로 덮어쓰기.
+_HERE = os.path.dirname(os.path.abspath(__file__))
+VIDEO_ROOT = os.environ.get(
+    "NOTIFI_VIDEO_ROOT",
+    os.path.normpath(os.path.join(_HERE, "..", "..", "collection_data", "v2")),
+)
 
-# 결과 GT(.npz) 저장 폴더
-GT_ROOT = os.path.expanduser("~/gvhmr_gt")
+# 결과 GT(.npz) 는 각 영상과 같은 폴더에 저장됨 (영상 옆 _pose_overlay.mp4 처럼).
+#   예: .../bed_exit_failed_t001/mhw_..._t001_video.mp4
+#       .../bed_exit_failed_t001/mhw_..._t001_pose_gvhmr.npz  ← 여기
 
 # GVHMR 실행 중간 산출물(렌더 영상·전처리 캐시) 삭제해서 디스크 절약
 DELETE_TMP = True
@@ -70,15 +75,15 @@ def extract_joints(pt_path: str):
 
 
 def main():
-    os.makedirs(GT_ROOT, exist_ok=True)
     videos = sorted(glob.glob(os.path.join(VIDEO_ROOT, "**", "*_video.mp4"), recursive=True))
     print(f"총 영상: {len(videos)}개")
-    print(f"GT 저장: {GT_ROOT}\n")
+    print(f"GT 저장: 각 영상과 같은 폴더에 <uid>_pose_gvhmr.npz\n")
 
     done = skipped = failed = 0
     for i, vid in enumerate(videos, 1):
         uid = video_to_uid(vid)
-        out_npz = os.path.join(GT_ROOT, f"{uid}_pose_gvhmr.npz")
+        # GT 는 영상과 같은 폴더에 저장 (영상 옆)
+        out_npz = os.path.join(os.path.dirname(vid), f"{uid}_pose_gvhmr.npz")
 
         if os.path.exists(out_npz):
             skipped += 1
@@ -88,8 +93,9 @@ def main():
         print(f"[{i}/{len(videos)}] RUN  {uid}")
 
         # 1) GVHMR 실행 (-s = static_cam: 고정 카메라라 SLAM 생략)
+        #    demo_gt.py = demo.py 에서 렌더 호출만 제거한 GT 전용 버전 (시간 절약)
         r = subprocess.run(
-            ["python", "tools/demo/demo.py", "--video", vid, "-s"],
+            ["python", "tools/demo/demo_gt.py", "--video", vid, "-s"],
             cwd=GVHMR_ROOT,
         )
         if r.returncode != 0:

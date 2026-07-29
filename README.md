@@ -1,6 +1,6 @@
 # NotiFi Dataset Collection v2.0
 
-NotiFi의 3TX+1RX CSI, RGB 영상, 13-point pose teacher GT를 동기화해 수집하는 현장용 도구다. 기준은 `NotiFi 데이터셋 수집 계획서 v2.0 찐막 (2026-07-24)`이며, 이전 데이터셋의 배경음·가전 상태별 분기와 과거 라벨은 사용하지 않는다.
+NotiFi의 3TX+1RX CSI와 RGB 영상을 동기화해 수집하고, 영상에서 GVHMR로 3D pose teacher GT를 만드는 현장용 도구다. 기준은 `NotiFi 데이터셋 수집 계획서 v2.0 찐막 (2026-07-24)`이며, 이전 데이터셋의 배경음·가전 상태별 분기와 과거 라벨은 사용하지 않는다.
 
 ## 수집 목표
 
@@ -170,21 +170,100 @@ python scripts/annotate_trial.py PATH_TO_META_JSON `
 planned cue와 actual onset 차이가 0.5초를 넘거나 동작 정의를 위반하면 `REJECT`로 기록하고 재수집한다.
 정적 라벨은 `--actual-onset`, `--action-end`를 생략하면 자동으로 `0.0`, `10.0`이 기록된다. DANGER는 `--impact`가 필수다.
 
-## 7. 13-point pose teacher GT
+## 7. 3D teacher GT (GVHMR)
 
-한 trial:
+teacher GT는 **GVHMR**로 만든다. 이전의 mediapipe 13-point(`extract_pose13.py`)는 카메라 각도 때문에 절대 높이·바닥정렬이 부정확해 교체했다. GVHMR는 **중력정렬 월드 3D 좌표(절대 높이 포함)**를 주며, 낙상·침대탈출처럼 높이가 중요한 라벨에서 차이가 크다.
+
+- 입력: 각 trial의 `*_video.mp4`
+- 출력(GT): 같은 폴더에 `*_pose_gvhmr.npz`
+  - `joints_world` `(T,22,3)` — SMPL 22관절 월드 3D 좌표 = **학습 타깃**
+  - `transl` `(T,3)` — 골반 위치(높이 포함), `frame_index` `(T,)`
+- **학습엔 이 `.npz` 숫자만 쓴다.** 오버레이/스켈레톤 영상은 사람이 눈으로 검수하는 용도일 뿐 학습에 안 들어간다.
+
+### 7.1 환경 (GVHMR는 NVIDIA GPU 필수)
+
+| 내 장비 | 방법 |
+| --- | --- |
+| Windows + NVIDIA GPU | **WSL2 로컬** (7.2). 가장 빠르고 오프라인 가능 |
+
+
+> Mac은 WSL·CUDA가 없어 로컬 GVHMR가 불가능하다. 이 경우 Colab을 쓴다. GVHMR는 리눅스 기준 프로젝트라 네이티브 Windows(비 WSL)는 pytorch3d 빌드가 번거로워 권장하지 않는다.
+
+### 7.2 설치 (Windows + NVIDIA, 최초 1회)
 
 ```powershell
-python scripts/extract_pose13.py PATH_TO_TRIAL_FOLDER --overlay
+wsl --install -d Ubuntu      # WSL2 우분투 (재부팅)
 ```
 
-한 session 전체:
+**사전 준비 & 확인:**
+- 윈도우에 **최신 NVIDIA 드라이버**가 설치돼 있어야 WSL에서 GPU가 잡힌다.
+- 우분투 **첫 실행 시 Unix 사용자(이름/비밀번호) 만들기** 화면이 나오면 하나 만든다. (일반 사용자로 진행되며 `setup_gvhmr.sh`가 알아서 처리한다.)
+- 우분투(bash)에서 GPU 인식 확인:
 
-```powershell
-python scripts/extract_pose13.py --root collection_data/v2/SUBJECT/E01/SESSION --overlay
+```bash
+nvidia-smi -L      # 내 GPU 이름이 나오면 OK. 안 나오면 윈도우 NVIDIA 드라이버부터 최신으로.
 ```
 
-출력은 머리, 양쪽 어깨·팔꿈치·손목·골반·무릎·발목의 world-coordinate 13-point pose와 validity mask다. `absence`는 reconstruction에서 자동 제외한다. pose valid ratio 95% 미만은 reconstruction 재수집 대상이며, CSI-영상 최근접 timestamp residual p95가 50 ms를 넘으면 REVIEW, 100 ms를 넘으면 재수집한다.
+> **경로 규칙**: 이하 `/mnt/c/경로/NotiFi-Data`는 **1장에서 clone한 repo의 WSL 경로**다. `/mnt/c` = 윈도우 C드라이브. 예를 들어 `C:\Users\내이름\NotiFi-Data`에 clone했으면 → `/mnt/c/Users/내이름/NotiFi-Data`. **7.3~7.5 명령은 모두 이 repo 폴더 안에서 실행**하므로, WSL에서 먼저 자기 경로로 이동해 둔다: `cd /mnt/c/경로/NotiFi-Data`
+
+body model(`SMPLX_NEUTRAL.npz` 필수, `SMPL_NEUTRAL.pkl` 선택)은 라이선스 파일이라 자동 다운로드가 안 된다. 팀 공유드라이브에서 받거나 [SMPL-X](https://smpl-x.is.tue.mpg.de) 등록 후 받아 한 폴더에 둔다. 그 폴더를 `BODY_MODELS_SRC`로 넘겨 원클릭 설치:
+
+```bash
+BODY_MODELS_SRC=/mnt/c/Users/"이름"/Downloads/smpl_models \
+  bash /mnt/c/경로/NotiFi-Data/scripts/smpl/setup_gvhmr.sh
+```
+
+`setup_gvhmr.sh`가 miniconda + `gvhmr`(py3.10) env, GVHMR clone, 의존성(torch cu121 + pytorch3d + chumpy 우회), 체크포인트 4종(HuggingFace 미러), body model 배치, `demo_gt.py`(렌더 제거판) 생성을 모두 처리한다. 다시 실행해도 된 건 건너뛴다.
+
+### 7.3 (시작 전) 이전 mediapipe 산출물 정리
+
+이전에 mediapipe(`extract_pose13.py`)로 만든 결과가 남아 있으면, GT 생성 전에 `scripts/smpl/clean_mediapipe.py`로 지워 용량을 확보한다. (처음부터 GVHMR로만 수집한 경우엔 지울 게 없어 DRY-RUN이 0개로 나오니 건너뛰면 된다.) 각 trial 폴더의 mediapipe 3종이 대상이다.
+
+| 파일 | 정체 | 기본 동작 |
+| --- | --- | --- |
+| `*_pose_overlay.mp4` | mediapipe 오버레이 영상 (용량 대부분) | **삭제** |
+| `*_pose_qc.json` | mediapipe 포즈 QC | **삭제** |
+| `*_pose13.csv` | 구 mediapipe teacher GT | **유지** (GVHMR 비교 baseline). `--include-pose13`로만 삭제 |
+
+GVHMR 산출물(`*_pose_gvhmr.npz` / `*_skeleton3d.mp4` / `*_overlay3d.mp4`)과 원본·CSI·meta·checksum은 **건드리지 않는다.**
+
+**1) 먼저 DRY-RUN** — 무엇이 얼마나 지워질지만 확인(아무것도 안 지움):
+
+```bash
+python scripts/smpl/clean_mediapipe.py
+```
+
+출력 예: `*_pose_overlay.mp4 : 789개 10.0GB`, `*_pose_qc.json : 789개 0.3MB`, 합계 표시.
+
+**2) 실제 삭제** — `--apply`를 붙인다:
+
+```bash
+python scripts/smpl/clean_mediapipe.py --apply                    # overlay + qc 삭제 (pose13 유지)
+python scripts/smpl/clean_mediapipe.py --include-pose13 --apply   # pose13 까지 전부 삭제
+```
+
+옵션: `--root <경로>`로 대상 루트 변경(기본 `collection_data/v2`). 표준 라이브러리만 쓰므로 `.venv`/conda 없이 아무 Python으로 실행된다(WSL·Windows·Mac 무관).
+
+> 참고: 이전 mediapipe 방식은 `scripts/extract_pose13.py`였다(now deprecated). 세부 QC 기준(pose valid ratio, timestamp residual 등)이 필요하면 git 이력의 이전 7장을 참고한다.
+
+### 7.4 GT 생성 (배치)
+
+```bash
+cd /mnt/c/경로/NotiFi-Data                                  # repo 폴더 (위 '경로 규칙' 참고)
+source ~/miniconda3/etc/profile.d/conda.sh && conda activate gvhmr
+python scripts/smpl/batch_gvhmr_fast.py                      # 스크립트가 알아서 ~/GVHMR 로 이동해 실행
+```
+
+repo 안 `collection_data/v2/**/ *_video.mp4`를 모두 찾아 각 폴더에 `*_pose_gvhmr.npz`를 만든다. **이어하기**: 이미 있는 `.npz`는 건너뛰므로 끊겨도 다시 실행하면 이어진다. 속도는 10초 영상당 ~60초(RTX 3060 Ti), peak VRAM ~4.9GB. 밤새 돌리려면 `nohup ... > ~/batch.log 2>&1 &` 후 `tail -f ~/batch.log`.
+
+### 7.5 검수 시각화 (선택, 표본만)
+
+```bash
+python scripts/smpl/viz_gvhmr_gt.py --uid <trial_uid>      # 3D 스켈레톤 (높이·자세)
+python scripts/smpl/overlay_gvhmr_gt.py --uid <trial_uid>  # 원본영상 위 2D 오버레이 (정합 스팟체크)
+```
+
+`--uid` 없이 실행하면 사용 가능한 목록을 보여준다. 모든 영상에 만들 필요 없다.
 
 ## 8. 진행률과 최종 QC
 

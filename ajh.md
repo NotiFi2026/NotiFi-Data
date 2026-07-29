@@ -186,9 +186,10 @@ python scripts/collect_dataset.py --label chair_exit_fall --repeat 10 --safety-c
 
 ```powershell
 python scripts/show_progress.py --subject ajh --environment E01
-python scripts/extract_pose13.py --root collection_data/v2/ajh/E01/SESSION_ID --overlay
 python scripts/validate_collection.py --write-report collection_data/v2/qc_report.json
 ```
+
+teacher GT(3D pose)는 mediapipe(`extract_pose13.py`) 대신 **GVHMR**로 만든다. 수집을 마친 뒤 WSL에서 생성한다 → [README 7장 “3D teacher GT (GVHMR)”](README.md) 참고.
 
 세부 동작 순서와 재수집 기준은 [수집 매뉴얼](docs/collection_manual.md)을 따른다.
 DANGER는 건강한 성인의 통제 하강으로만 수행하며 안전요원과 이중 매트가 없으면 실행하지 않는다.
