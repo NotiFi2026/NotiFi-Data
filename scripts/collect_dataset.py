@@ -224,6 +224,7 @@ def validate_session_limits(
     config: SessionConfig,
     risk: str,
     requested: int,
+    danger_limit: int = 10,
 ) -> None:
     session_rows = [
         row
@@ -237,10 +238,14 @@ def validate_session_limits(
             f"Session accepted/captured limit would exceed 60: "
             f"existing={len(session_rows)}, requested={requested}"
         )
+    if risk != "DANGER" or danger_limit <= 0:
+        return
     danger_count = sum(row.get("risk_label") == "DANGER" for row in session_rows)
-    if risk == "DANGER" and danger_count + requested > 10:
+    if danger_count + requested > danger_limit:
         raise ValueError(
-            f"Session danger limit would exceed 10: existing={danger_count}, requested={requested}"
+            f"Session danger limit would exceed {danger_limit}: "
+            f"existing={danger_count}, requested={requested}. "
+            "Use --danger-limit to raise it or 0 to disable."
         )
 
 
@@ -720,7 +725,7 @@ def print_plan(
     )
     print(
         f"trial_plan={format_trial_plan(trial_numbers)} "
-        f"default_break={break_sec:.1f}s"
+        f"break={break_sec:.1f}s"
     )
     if spec.risk == "DANGER":
         if danger_mid_rest_sec > 0:
@@ -769,6 +774,12 @@ def main() -> None:
         "--safety-confirmed",
         action="store_true",
         help="Required for DANGER trials after mat, spotter, chair, and participant checks.",
+    )
+    parser.add_argument(
+        "--danger-limit",
+        type=int,
+        default=10,
+        help="Maximum DANGER trials per session. 0 disables the check.",
     )
     args = parser.parse_args()
 
@@ -828,7 +839,9 @@ def main() -> None:
             "Delete rejected trial folders to reuse their numbers or use --allow-extra."
         )
 
-    validate_session_limits(existing_file_rows, config, spec.risk, repeat)
+    validate_session_limits(
+        existing_file_rows, config, spec.risk, repeat, args.danger_limit
+    )
     print_plan(config, spec, repeat, trial_numbers, args.break_sec, args.danger_mid_rest_sec)
     if args.dry_run:
         print("[DRY RUN] Hardware was not opened and no files were written.")
